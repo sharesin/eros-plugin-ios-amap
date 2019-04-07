@@ -161,7 +161,7 @@ static const void *componentKey = &componentKey;
     self.mapView.showsScale = _showScale;
     [self.mapView setZoomLevel:_zoomLevel];
     
-    if (self.mapView.showsUserLocation) {
+    if (self.mapView.userLocation.updating && self.mapView.userLocation.location) {
         [self.mapView setCenterCoordinate: self.mapView.userLocation.location.coordinate];
     }else {
         [self.mapView setCenterCoordinate:_centerCoordinate];
@@ -631,7 +631,7 @@ static const void *componentKey = &componentKey;
             [json setObject:[NSString stringWithFormat:@"%f", mapView.centerCoordinate.longitude] forKey:@"longitude"];
             //获取标注中心点
             NSMutableDictionary *info = [[NSMutableDictionary alloc] init];
-            [info setObject:[WXMapViewModule convertToJsonData:json] forKey:@"centerPosition"];
+            [info setObject:json forKey:@"centerPosition"];
             
             [self fireEvent:@"camerachange" params:info];
         }
