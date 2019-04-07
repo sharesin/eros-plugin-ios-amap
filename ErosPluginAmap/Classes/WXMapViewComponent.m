@@ -144,9 +144,7 @@ static const void *componentKey = &componentKey;
     CGSize windowSize = window.rootViewController.view.frame.size;
     self.mapView = [[MAMapView alloc] initWithFrame:CGRectMake(0, 0, windowSize.width, windowSize.height)];
     self.mapView.showsUserLocation = _showGeolocation;
-    if (_showGeolocation) {
-        self.mapView.userTrackingMode = MAUserTrackingModeFollow;
-    }
+    self.mapView.userTrackingMode = MAUserTrackingModeFollow;
     self.mapView.showsCompass = _showsCompass;
     self.mapView.showsLabels = YES;
     self.mapView.delegate = self;
@@ -538,6 +536,7 @@ static const void *componentKey = &componentKey;
         }
         if ([annotation isKindOfClass:[MAUserLocation class]]) {
             annotationView.image = [UIImage imageNamed:@"gpsStat2"];
+            [self.mapView setCenterCoordinate:annotation.coordinate];
         }
         
         annotationView.zIndex = markerComponent.zIndex;

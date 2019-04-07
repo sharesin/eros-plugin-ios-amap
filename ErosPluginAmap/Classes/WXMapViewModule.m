@@ -48,15 +48,13 @@ WX_EXPORT_METHOD(@selector(geoAddress:callback:))
     self.search.delegate = self;
 }
     
-- (void)geoAddress: (NSString *) searchLatlonPoint callback:(WXModuleCallback)callback {
+- (void)geoAddress: (NSDictionary *) searchLatlonPoint callback:(WXModuleCallback)callback {
     
     if (searchLatlonPoint) {
         @try {
             self.callback = nil;
             self.callback = callback;
-            //解析JSON
-            NSDictionary *dic = [WXMapViewModule dictionaryWithJsonString:searchLatlonPoint];
-            CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([[dic objectForKey:@"latitude"] floatValue], [[dic objectForKey:@"longitude"] floatValue]);
+            CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake([[searchLatlonPoint objectForKey:@"latitude"] floatValue], [[searchLatlonPoint objectForKey:@"longitude"] floatValue]);
             [self searchReGeocodeWithCoordinate:coordinate];
         } @catch (NSException *exception) {
             
