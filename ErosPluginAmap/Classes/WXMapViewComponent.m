@@ -340,7 +340,7 @@ static const void *componentKey = &componentKey;
     if (fixed) {
         [a1 setLockedToScreen:YES];
         [a1 setLockedScreenPoint:CGPointMake(self.mapView.center.x, self.mapView.bounds.size.height/2)];
-        [a1 setIconImage:@"greenPin"];
+        [a1 setIconImage:@"redPin"];
     }
     [self.mapView addAnnotation:a1];
 }
@@ -391,7 +391,7 @@ static const void *componentKey = &componentKey;
                 annotationView.frame = CGRectMake(annotationView.frame.origin.x, annotationView.frame.origin.y,marker.pinWidth, marker.pinHeight);
             }
         } else {
-            annotationView.image = [UIImage imageNamed:@"greenPin"];
+            annotationView.image = [UIImage imageNamed:@"redPin"];
         }
         
     }];
@@ -510,7 +510,8 @@ static const void *componentKey = &componentKey;
                 
                 
             }else {
-                annotationView.image = [UIImage imageNamed:@"greenPin"];
+                annotationView.image = [UIImage imageNamed:@"redPin"];
+                
             }
             
         }];
