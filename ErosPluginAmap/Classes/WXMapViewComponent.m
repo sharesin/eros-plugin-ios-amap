@@ -144,9 +144,9 @@ static const void *componentKey = &componentKey;
     CGSize windowSize = window.rootViewController.view.frame.size;
     self.mapView = [[MAMapView alloc] initWithFrame:CGRectMake(0, 0, windowSize.width, windowSize.height)];
     self.mapView.showsUserLocation = _showGeolocation;
-//    if (_showGeolocation) {
-//        self.mapView.userTrackingMode = MAUserTrackingModeFollow;
-//    }
+    if (_showGeolocation) {
+        self.mapView.userTrackingMode = MAUserTrackingModeFollow;
+    }
     self.mapView.showsCompass = _showsCompass;
     self.mapView.showsLabels = YES;
     self.mapView.delegate = self;
@@ -160,7 +160,12 @@ static const void *componentKey = &componentKey;
     [super viewDidLoad];
     self.mapView.showsScale = _showScale;
     [self.mapView setZoomLevel:_zoomLevel];
-    [self.mapView setCenterCoordinate:_centerCoordinate];
+    
+    if (self.mapView.showsUserLocation) {
+        [self.mapView setCenterCoordinate: self.mapView.userLocation.location.coordinate];
+    }else {
+        [self.mapView setCenterCoordinate:_centerCoordinate];
+    }
     UIView *zoomPannelView = [self makeZoomPannelView];
     zoomPannelView.center = CGPointMake(self.view.bounds.size.width -  CGRectGetMidX(zoomPannelView.bounds) - 10,
                                         self.view.bounds.size.height -  CGRectGetMidY(zoomPannelView.bounds) - 10);
