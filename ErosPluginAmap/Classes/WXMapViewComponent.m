@@ -84,6 +84,7 @@ static const void *componentKey = &componentKey;
 @interface WXMapViewComponent()
 
 @property (nonatomic, assign) BOOL isMapViewRegionChangedFromTableView;
+@property (nonatomic, assign) BOOL isFirstLoad;
     
 @end
 
@@ -99,7 +100,7 @@ static const void *componentKey = &componentKey;
     BOOL _isDragend;
     BOOL _showsCompass;
     BOOL _isCameraChange;
-
+    NSMutableArray *_gestures; //设置允许对地图做哪些手势操作
 }
 
 - (instancetype)initWithRef:(NSString *)ref
@@ -112,6 +113,11 @@ static const void *componentKey = &componentKey;
     self = [super initWithRef:ref type:type styles:styles attributes:attributes events:events weexInstance:weexInstance];
     if (self) {
         NSArray *center = [attributes wxmap_safeObjectForKey:@"center"];
+        //获取用户设置允许的手势操作
+        NSArray *gestures = [attributes wxmap_safeObjectForKey:@"gestures"];
+        if ([WXConvert isValidatedArray:gestures]) {
+            _gestures = gestures;
+        }
         if ([WXConvert isValidatedArray:center]) {
             _centerCoordinate = [WXConvert CLLocationCoordinate2D:center];
         }
@@ -138,17 +144,26 @@ static const void *componentKey = &componentKey;
     return self;
 }
 
+
 - (UIView *) loadView
 {
     UIWindow *window = [UIApplication sharedApplication].keyWindow;
     CGSize windowSize = window.rootViewController.view.frame.size;
     self.mapView = [[MAMapView alloc] initWithFrame:CGRectMake(0, 0, windowSize.width, windowSize.height)];
+    self.isFirstLoad = YES;
     self.mapView.showsUserLocation = _showGeolocation;
     self.mapView.userTrackingMode = MAUserTrackingModeFollow;
     self.mapView.showsCompass = _showsCompass;
     self.mapView.showsLabels = YES;
     self.mapView.delegate = self;
     
+    // 判断gestures的参数设置地图手势，默认都开启
+    if (_gestures) {
+        self.mapView.zoomEnabled = [_gestures containsObject:@"zoom"]?YES:NO; ///是否支持缩放, 默认YES
+        self.mapView.rotateEnabled = [_gestures containsObject:@"rotate"]?YES:NO; ///是否支持旋转, 默认YES
+        self.mapView.scrollEnabled = [_gestures containsObject:@"scroll"]?YES:NO; ///是否支持平移, 默认YES
+        self.mapView.rotateCameraEnabled = [_gestures containsObject:@"tilt"]?YES:NO; ///是否支持camera旋转, 默认YES
+    }
     
     return self.mapView;
 }
@@ -534,9 +549,15 @@ static const void *componentKey = &componentKey;
         if (markerComponent.title.length == 0 && markerComponent.subTitle.length == 0) {
             annotationView.canShowCallout  = NO;
         }
+        
         if ([annotation isKindOfClass:[MAUserLocation class]]) {
             annotationView.image = [UIImage imageNamed:@"gpsStat2"];
-            [self.mapView setCenterCoordinate:annotation.coordinate];
+            if (self.isFirstLoad) {
+                MAUserLocation *an =  (MAUserLocation *)annotation;
+                
+                [self.mapView setCenterCoordinate:an.location.coordinate];
+                self.isFirstLoad = NO;
+            }
         }
         
         annotationView.zIndex = markerComponent.zIndex;
